@@ -1,0 +1,20 @@
+version: "3"
+services:
+  backend:
+    build: ./backend
+    tty: true
+    volumes:
+      - "./backend:/backend"
+    working_dir: "/backend"
+    ports:
+      - "3000:3000"
+    command: "node"
+  frontend:
+    build: ./frontend
+    tty: true
+    volumes:
+      - "./frontend:/frontend"
+    working_dir: "/frontend"
+    ports:
+      - "3010:8080"
+    command: "node"
