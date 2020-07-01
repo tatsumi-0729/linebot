@@ -25,7 +25,7 @@ app.post("/callback", line.middleware(env), (req, res) => {
 });
 
 app.get("/", function (req, res) {
-  res.send("Hello world\n");
+  res.send("Hello world!!\n");
 });
 
 // event handler
