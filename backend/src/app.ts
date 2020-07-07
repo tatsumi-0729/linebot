@@ -1,46 +1,76 @@
 import * as line from "@line/bot-sdk";
-import express from "express";
-import LineMessageEvent from "./model/line_message_event";
-// envの読み込み
+import bodyParser from "body-parser";
 import * as dotenv from "dotenv";
+import express from "express";
+import LineAccessToken from "./entity/line_access_token";
+import LineClient from "./infra/line_client";
+import LineMessage from "./model/line_message";
+import LineMessageEvent from "./model/line_message_event";
+import LineMessageSource from "./model/line_message_source";
+import User from "./model/user";
+import MessageRepository from "./repository/message";
+import StoreMessage from "./usecase/store_message";
+
 dotenv.config();
 
-// create LINE SDK config from env variables
-const env = {
+const config = {
   channelSecret: process.env.CHANNEL_SECRET || "",
 };
 
+// init all
+let client: line.Client;
+new LineAccessToken().renew().then((channelAccessToken) => {
+  client = new line.Client({ channelAccessToken, ...config });
+});
+const messageRepository = new MessageRepository();
+
 const app = express();
 
-// create LINE SDK client
-// const client = new line.Client(config);
-
-// register a webhook handler with middleware
-app.post("/callback", line.middleware(env), (req, res) => {
+app.post("/callback", line.middleware(config), (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
-    .then(() => res.json({}))
+    .then(() => res.json("{}"))
     .catch((err: Error) => {
+      console.error(err);
       res.status(500).end();
     });
 });
 
-app.get("/", function (req, res) {
-  res.send("Hello world!!\n");
-});
-
-// event handler
-const handleEvent = async (event: LineMessageEvent) => {
-  console.log(event);
-  // TODO 将来的には不要
-  if (event.type !== "message" || event.message.type !== "text") {
+const handleEvent = async (ev: LineMessageEvent) => {
+  console.log(ev);
+  // FIXME 将来的には不要。
+  if (ev.type !== "message" || ev.message.type !== "text") {
+    // ignore non-text-message event
     return null;
   }
+  // TODO store message
+  const sm = new StoreMessage(messageRepository, new LineClient(client));
+  const event = new LineMessageEvent(ev.replyToken, ev.type, ev.timestamp,
+    new LineMessageSource(ev.source.type, ev.source.userId),
+    new LineMessage(ev.message.id, ev.message.type, ev.message.text));
+  await sm.execute(event);
 };
 
-// TODO store message
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.post("/users", async (req, res) => {
+  const users = messageRepository.users();
+  res.json({
+    users,
+  });
+});
+
+app.post("/messages", async (req, res) => {
+  console.log(req.body);
+  const userId = req.body.userId;
+  const messages = messageRepository.messages(new User(userId));
+  res.json({
+    messages,
+  });
+});
 
 // listen on port
-const port: number = 3000;
+const port = 3000;
 app.listen(port, () => {
   console.log(`listening on ${port}`);
 });

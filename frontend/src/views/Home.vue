@@ -1,18 +1,29 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1 class="top_message">{{topMessage}}</h1>
+    <ShowAll />
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+// @/ で src/ 以下からの絶対パス
+import ShowAll from "@/components/ShowAll.vue";
 
-export default {
-  name: 'Home',
+@Component({
   components: {
-    HelloWorld
-  }
+    ShowAll
+  },
+})
+export default class Home extends Vue {
+  public topMessage = "LINE BOT";
 }
 </script>
+
+<style>
+.top_message {
+  font-size: 40px;
+  text-align: center;
+  margin: 20px 0px 20px 0px;
+}
+</style>

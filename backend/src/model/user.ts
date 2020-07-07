@@ -1,5 +1,8 @@
 export default class User {
   public userId: string = "";
+  public name: string = "";
+  public image: string = "";
+
 
   constructor(id: string) {
     this.userId = id;

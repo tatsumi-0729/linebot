@@ -2,7 +2,7 @@ import axios from "axios";
 import { AxiosRequestConfig } from "axios";
 import qs from "qs";
 
-export default class LineAccessToke {
+export default class LineAccessToken {
   private accessToken: string | null = null;
 
   public nullTest() {
@@ -13,8 +13,7 @@ export default class LineAccessToke {
     return this.accessToken;
   }
 
-  public async axiosPost() {
-    this.accessToken = "";
+  public async getEnv() {
     const credentials = {
       client_id: process.env.CHANNEL_ID,
       client_secret: process.env.CHANNEL_SECRET,
