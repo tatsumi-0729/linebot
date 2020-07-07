@@ -19,7 +19,7 @@ const config = {
 
 // init all
 let client: line.Client;
-new LineAccessToken().renew().then((channelAccessToken) => {
+new LineAccessToken().getEnv().then((channelAccessToken) => {
   client = new line.Client({ channelAccessToken, ...config });
 });
 const messageRepository = new MessageRepository();
