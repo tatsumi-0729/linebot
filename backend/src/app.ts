@@ -17,7 +17,7 @@ const config = {
   channelSecret: process.env.CHANNEL_SECRET || "",
 };
 
-// init all
+// init all!
 let client: line.Client;
 new LineAccessToken().getEnv().then((channelAccessToken) => {
   client = new line.Client({ channelAccessToken, ...config });
