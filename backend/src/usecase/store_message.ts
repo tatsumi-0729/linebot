@@ -6,11 +6,13 @@ import MessageRepository from "../repository/message";
 export default class StoreMessage {
   private messageRepository: MessageRepository;
   private lineClient: LineClient;
+
   constructor(messageRepository: MessageRepository, lineClient: LineClient) {
     this.messageRepository = messageRepository;
     this.lineClient = lineClient;
   }
 
+  // メッセージを保存
   public async execute(event: LineMessageEvent) {
     console.log("----");
     const message: Message = event.toMessage();
